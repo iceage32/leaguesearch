@@ -114,7 +114,7 @@
                 if(typeof Ice.data.bookmarks != 'undefined' && Ice.data.bookmarks.length != 0) {
                     $("#bookmark-list").html('');
                     $.each(Ice.data.bookmarks, function(i, e) {
-                        $("#bookmark-list").append("<a href=\""+e.url+"\"><li>"+e.title+"<span class='bookmark-remove' data-id='"+i+"'>x</span></li></a>");
+                        $("#bookmark-list").append("<li><a href=\""+e.url+"\">"+e.title+"</a><span class='bookmark-remove' data-id='"+i+"'>x</span></li>");
                     });
                 } else {
                     $("#bookmarks .content .container").append('<center>No bookmarks.<br>You can add bookmarks trough the <b>+</b> button</center>');
