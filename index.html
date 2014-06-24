@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Page title -->
+        <title>LoLFocus Hompage</title>
+        
+        <!-- Meta -->
+        <meta charset="UTF-8">
+        <meta name="author" content="IcEaGe">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        
+        <!-- Style -->
+        <link rel="stylesheet/less" type="text/css" href="assets/css/main.less" />
+        <!--<link rel="stylesheet" type="text/css" href="assets/css/main.css" />-->
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,600,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.min.css" />
+
+        <!-- Script -->
+        <script src="assets/js/jquery-2.1.1.min.js"></script>
+        <script src="assets/js/less-1.7.0.min.js"></script>
+        <script src="assets/js/jquery.cookie.js"></script>
+        <script src="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+        <script src="assets/js/ice.js"></script>
+        <script src="assets/js/ice.ui.js"></script>
+    </head>
+    <body>
+        
+        <!-- Background -->
+        <div id="background"></div>
+        
+        <!-- Layout -->
+        <div class="layout">
+            <div class="menu">
+                <a id="settings-button" class="button" style="float: right">Settings</a>
+                <a id="background-button" class="button" style="float: right">Select background</a>
+                <a id="sidebar-button" class="button" style="float: left">Open sidebar</a>
+            </div>
+            
+            <!-- Logo -->
+            <div class="logo"><img src='assets/images/lolflogo.png' /></div>
+            
+            <!-- Search -->
+            <div class="search">
+                <div class="title">Search</div>
+                
+                <input id="searchbox" type="text" placeholder="Search..." />
+            </div>
+            
+            <div class="two-column">
+                <div id='bookmarks' class="one big-modal">
+                    <div class="title">Bookmarks</div>
+                    <div class='bookmark-add'>+</div>
+                    <div class='content'>
+                        <div class='container'>
+                            <div class="loading-circle" id="bookmark-loading"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id='newsfeed' class="two big-modal">
+                    <div class="title">News feed</div>
+                    <div class='content'>
+                        <div class='container'>
+                            <div class="loading-circle" id="newsfeed-loading"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="spacer">Useful sites</div>
+            <ul id='sidebar-normal'>
+            </ul>
+            <div class="spacer">My profiles</div>
+            <ul id="sidebar-profile">
+                <center>Go to settings and specify summoner name and region to access this feature</center>
+            </ul>
+        </div>
+        
+        <!-- Modal -->
+        <div class="dimmer"></div>
+        <div id="modal" class="big-modal popup-modal">
+            <div class="close">&#215</div>
+            <div class="title"></div>
+            <div class="content">
+                <div class="container"></div>
+            </div>
+        </div>
+    
+        <script>
+            //Search functionality
+            $("#searchbox").keyup(function(e) {
+                var code = (e.keyCode ? e.keyCode : e.which);
+                if(code == 13) {
+                    window.location = "http://google.com/search?q=" + encodeURIComponent($("#searchbox").val());
+                }
+            });
+            
+            //Update data from cookie
+            Ice.fn.data.updateFromCookie();
+            console.log(Ice.data);
+            
+            //set background
+            Ice.ui.background.set();
+            
+            //set bookmarks
+            $('#bookmark-loading').remove();
+            $("#bookmarks .content .container").append('<ul id="bookmark-list"></ul>');
+            function updateBookmarks() {
+                $("#bookmarks .content .container").html('');
+                $("#bookmarks .content .container").append('<ul id="bookmark-list"></ul>');
+                if(typeof Ice.data.bookmarks != 'undefined' && Ice.data.bookmarks.length != 0) {
+                    $("#bookmark-list").html('');
+                    $.each(Ice.data.bookmarks, function(i, e) {
+                        $("#bookmark-list").append("<a href=\""+e.url+"\"><li>"+e.title+"<span class='bookmark-remove' data-id='"+i+"'>x</span></li></a>");
+                    });
+                } else {
+                    $("#bookmarks .content .container").append('<center>No bookmarks.<br>You can add bookmarks trough the <b>+</b> button</center>');
+                }
+            }
+            updateBookmarks();
+            //open bookmark add modal
+            $('.bookmark-add').click(function() {
+               Ice.ui.modal.set('Add bookmark', "Link: <input type='text' id='bookmark-add-link' placeholder='http://www.example.com/' /> *do not forget http:// or https://<br/>\
+                                Name: <input type='text' id='bookmark-add-name' placeholder='Example' /> *This will be displayed on the list<br/>\
+                                <input type='button' id='bookmark-add-button' value='Add' />");
+                Ice.ui.modal.show();
+                $('#bookmark-add-button').click(function() {
+                    Ice.fn.addBookmark($('#bookmark-add-name').val(), $('#bookmark-add-link').val());
+                    updateBookmarks();
+                    Ice.ui.modal.hide();
+                });
+                return false;
+            });
+            //remove bookmark
+            $('.bookmark-remove').click(function() {
+                Ice.fn.removeBookmark($(this).data('id'));
+                updateBookmarks();
+                return false;
+            });
+            
+            //Set news feed
+            $.get((typeof Ice.data.newsfeed != 'undefined' ? Ice.data.newsfeed : Ice.settings.defaultNewsFeed), function (data) {
+                $('#newsfeed-loading').remove();
+                $("#newsfeed .content .container").append('<ul id="newsfeed-list"></ul>');
+                $(data).find("item").each(function () { // or "item" or whatever suits your feed
+                    var el = $(this);
+                    $("#newsfeed-list").append("<a href=\""+el.find("link").text()+"\"><li>"+el.find("title").text()+"</li></a>");
+                });
+                $('#newsfeed .content .container ul').mCustomScrollbar({
+                    theme: "minimal-dark"
+                });
+            });
+            
+            //Sidebar button
+            $('#sidebar-button').click(function() {
+                var sidebarnormal = '';
+                for(var i=0;i<Ice.ui.sidebar.pages.normal.length; i++) {
+                    sidebarnormal += '<a href="'+Ice.ui.sidebar.pages.normal[i].link+'"><li><img src="'+Ice.ui.sidebar.pages.normal[i].favicon+'" />'+Ice.ui.sidebar.pages.normal[i].name+'</li></a>';
+                }
+                $('#sidebar-normal').html(sidebarnormal);
+                
+                if(typeof Ice.data.summonerName != 'undefined' && typeof Ice.data.region != 'undefined') {
+                    var sidebarprofile = '';
+                    for(var i=0;i<Ice.ui.sidebar.pages.profile.length; i++) {
+                        var test = new Ice.fn.stringBuilder(Ice.ui.sidebar.pages.profile[i].link);
+                        test.bindParam(':region', Ice.data.region);
+                        test.bindParam(':name', Ice.data.summonerName);
+                        sidebarprofile += '<a href="'+test.get()+'"><li><img src="'+Ice.ui.sidebar.pages.profile[i].favicon+'" />'+Ice.ui.sidebar.pages.profile[i].name+'</li></a>';
+                    }
+                    $('#sidebar-profile').html(sidebarprofile);
+                }
+                Ice.ui.sidebar.toggle();
+            });
+            
+            //Settings button
+            $("#settings-button").click(function() {
+                Ice.ui.modal.set('Settings', "<div class='head'>General:</div>\
+                    <input type='checkbox' data-option='animations' "+((typeof Ice.data.animations != 'undefined' && Ice.data.animations == true) ? "checked='checked'" : "")+">Enable animations</input>\
+                    <div class='head'>League Information</div>\
+                    <b>Summoner name:</b>\
+                    <input type='text' id='settings-summonername' placeholder='Summoner name' "+(typeof Ice.data.summonerName != 'undefined' ? "value='"+Ice.data.summonerName+"'" : "")+"/>\
+                    <select id='settings-summonerregion'>\
+                        <option value='' disabled selected>Region</option>\
+                        <option value='na'>NA</option>\
+                        <option value='euw'>EUW</option>\
+                        <option value='eune'>EUNE</option>\
+                        <option value='oce'>OCE</option>\
+                    </select>\
+                    <input id='settings-summonersubmit' type='button' value='Submit' />");
+                Ice.ui.modal.show();
+                Ice.ui.settings.initHandlers();
+                return false;
+            });
+
+            //Background button
+            $("#background-button").click(function() {
+                Ice.ui.modal.set('Change background', Ice.ui.background.popup);
+                Ice.ui.modal.show();
+                Ice.ui.background.updateBackgroundList();
+                $('input:radio[name="backgroundtype"]').change(function() {
+                    Ice.ui.background.updateBackgroundList();
+                });
+                return false;
+            });
+            
+            $(window).resize(function() {
+                //Correct sidebar
+                Ice.ui.sidebar.reposition();
+            });
+            
+            //scroll
+            $('.sidebar').mCustomScrollbar({
+                theme: "minimal"
+            });
+            $('#modal .content').mCustomScrollbar({
+                theme: "inset-dark",
+                scrollButtons: {enable: true}
+            });
+            $('#bookmarks .content .container ul').mCustomScrollbar({
+                theme: "minimal-dark"
+            });
+        </script>
+    </body>
+</html>
