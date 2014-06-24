@@ -44,6 +44,7 @@
                 <div class="title">Search</div>
                 
                 <input id="searchbox" type="text" placeholder="Search..." />
+                <div class='suggestions'></div>
             </div>
             
             <div class="two-column">
@@ -221,6 +222,70 @@
             });
             $('#bookmarks .content .container ul').mCustomScrollbar({
                 theme: "minimal-dark"
+            });
+            
+            //search
+            function updateSearchSuggestions(query) {
+                if($('.suggestions .container').length == 0) {$('.suggestions').append('<div class="container"></div>')};
+                if($('.suggestions .container #search-url').length == 0) {
+                    if(ValidURL(query)) {
+                        $('.suggestions .container').append('<a href="'+query+'"><div id="search-url" class="element"><div class="type">Open site <b>'+query+'</b>\</div></a>');
+                    }
+                } else {
+                    if(ValidURL(query)) {
+                        $('.suggestions .container').html('<a href="'+query+'"><div id="search-url" class="element"><div class="type">Open site <b>'+query+'</b>\</div></a>');
+                    }
+                }
+                if($('.suggestions .container #search-web').length == 0) {
+                    $('.suggestions .container').append('<div id="search-web" class="element"><div class="type">Search on the web for <b>'+query+'</b>\
+                    <div class="sites">\
+                        <a href="http://google.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/google.png" /> Google</a>\
+                        <a href="http://search.yahoo.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/yahoo.png" /> Yahoo!</a>\
+                        <a href="http://www.bing.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/bing.png" /> Bing</a>\
+                    </div></div>');
+                } else {
+                    $('.suggestions .container #search-web').html('<div class="type">Search on the web for <b>'+query+'</b>\
+                    <div class="sites">\
+                        <a href="http://google.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/google.png" /> Google</a>\
+                        <a href="http://search.yahoo.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/yahoo.png" /> Yahoo!</a>\
+                        <a href="http://www.bing.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/bing.png" /> Bing</a>\
+                    </div>');
+                }
+                if($('.suggestions .container #search-summoner').length == 0) {
+                    $('.suggestions .container').append('<div id="search-summoner" class="element"><div class="type">Search for summoner: <b>'+query+'</b>\
+                    <div class="sites">\
+                        <a href="http://www.lolking.net/search?name='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/lolking.png" /> LoLKing</a>\
+                    </div></div>');
+                } else {
+                    $('.suggestions .container #search-summoner').html('<div class="type">Search for summoner: <b>'+query+'</b>\
+                    <div class="sites">\
+                        <a href="http://www.lolking.net/search?name='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/lolking.png" /> LoLKing</a>\
+                    </div>');
+                }
+                
+            }
+            function ValidURL(str) {
+                var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+                return regexp.test(str);    
+             }
+            
+            $('#searchbox').focusin(function() {
+                var needtoclose = true;
+                $('.suggestions').html('');
+                if($(this).val() != "") updateSearchSuggestions($(this).val());
+                $(this).bind('input', function(e) {
+                    if(needtoclose) {$('.two-column').fadeOut();}
+                    updateSearchSuggestions($(this).val());
+                    if($(this).val() == "") {$('.suggestions').html(''); $('.two-column').fadeIn();needtoclose=true;}
+                });
+                
+                $('.suggestions .container').mCustomScrollbar();
+            });
+            $('#searchbox').focusout(function() {
+            
+                $('.two-column').fadeIn();
+                $('.suggestions').html('');
+                $(this).unbind('input');
             });
         </script>
     </body>
