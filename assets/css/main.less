@@ -186,7 +186,7 @@ body {
 .menu {
     position: fixed;
     width: 100%;
-    overflow: auto;
+    overflow: none;
 }
 .button {
     background: #416cb1; /* Old browsers */
@@ -286,11 +286,26 @@ body {
         }
     }
 }
+.changebackground {
+    h2, hr {
+        clear: both;
+    }
+    h2 {
+        margin: 0;
+        padding: 0;
+        margin-left: 10px;
+    }
+    hr {
+        padding: 0px;
+        margin: 5px;
+    }
+}
 .backgroundlist {
     list-style: none;
     margin: 0;
     padding: 0;
     text-align: center;
+    overflow: auto;
     li {
         cursor: pointer;
         width: 30%;
@@ -300,11 +315,13 @@ body {
     }
 }
 #sidebar-button {
-    position: absolute;
+    position: fixed;
     left: -10px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: 0;
+    padding: 5px 10px;
+    font-size: 1.3em;
 }
 #modal .content .container {
     .head {
@@ -343,19 +360,15 @@ body {
 .bookmark-remove {
     float: right;
     font-weight: bold;
+    padding: 1px 7px;
     font-size: 20px;
-    margin-top: -3px;
+    margin-top: -5px;
+    margin-left: 0;
     display: none;
     cursor: pointer;
 }
 #bookmark-list li:hover .bookmark-remove {
     display: block;
-}
-#bookmark-list li:hover .bookmark-remove:hover:before {
-    color: #5c5c5c;
-    content: 'Close ';
-    font-size: 14px;
-    vertical-align: 1px;
 }
 .suggestions {
     .container {

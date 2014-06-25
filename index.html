@@ -14,14 +14,22 @@
         <!--<link rel="stylesheet" type="text/css" href="assets/css/main.css" />-->
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,600,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.min.css" />
+        <link rel="stylesheet" href="assets/icons/style.css" />
 
         <!-- Script -->
         <script src="assets/js/jquery-2.1.1.min.js"></script>
         <script src="assets/js/less-1.7.0.min.js"></script>
         <script src="assets/js/jquery.cookie.js"></script>
         <script src="http://malihu.github.io/custom-scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
-        <script src="assets/js/ice.js"></script>
-        <script src="assets/js/ice.ui.js"></script>
+        <script src="assets/js/ice/ice.js"></script>
+        <script src="assets/js/ice/ui/ice.ui.background.js"></script>
+        <script src="assets/js/ice/ui/ice.ui.bookmarks.js"></script>
+        <script src="assets/js/ice/ui/ice.ui.modal.js"></script>
+        <script src="assets/js/ice/ui/ice.ui.newsfeed.js"></script>
+        <script src="assets/js/ice/ui/ice.ui.settings.js"></script>
+        <script src="assets/js/ice/ui/ice.ui.sidebar.js"></script>
+        <script src="assets/js/ice/ui/constants.js"></script>
+        
     </head>
     <body>
         
@@ -33,7 +41,6 @@
             <div class="menu">
                 <a id="settings-button" class="button" style="float: right">Settings</a>
                 <a id="background-button" class="button" style="float: right">Select background</a>
-                <a id="sidebar-button" class="button" style="float: left">Open sidebar</a>
             </div>
             
             <!-- Logo -->
@@ -70,6 +77,7 @@
         </div>
     
         <!-- Sidebar -->
+        <a id="sidebar-button" class="button" style="float: left"><i class="icon-menu2"></i></a>
         <div class="sidebar">
             <div class="spacer">Useful sites</div>
             <ul id='sidebar-normal'>
@@ -83,7 +91,7 @@
         <!-- Modal -->
         <div class="dimmer"></div>
         <div id="modal" class="big-modal popup-modal">
-            <div class="close">&#215</div>
+            <div class="close">&#215;</div>
             <div class="title"></div>
             <div class="content">
                 <div class="container"></div>
@@ -115,7 +123,7 @@
                 if(typeof Ice.data.bookmarks != 'undefined' && Ice.data.bookmarks.length != 0) {
                     $("#bookmark-list").html('');
                     $.each(Ice.data.bookmarks, function(i, e) {
-                        $("#bookmark-list").append("<li><a href=\""+e.url+"\">"+e.title+"</a><span class='bookmark-remove' data-id='"+i+"'>x</span></li>");
+                        $("#bookmark-list").append("<li><a href=\""+e.url+"\">"+e.title+"</a><span class='bookmark-remove button' data-id='"+i+"'>x</span></li>");
                     });
                 } else {
                     $("#bookmarks .content .container").append('<center>No bookmarks.<br>You can add bookmarks trough the <b>+</b> button</center>');
@@ -155,8 +163,7 @@
                 });
             });
             
-            //Sidebar button
-            $('#sidebar-button').click(function() {
+            function updateSidebar() {
                 var sidebarnormal = '';
                 for(var i=0;i<Ice.ui.sidebar.pages.normal.length; i++) {
                     sidebarnormal += '<a href="'+Ice.ui.sidebar.pages.normal[i].link+'"><li><img src="'+Ice.ui.sidebar.pages.normal[i].favicon+'" />'+Ice.ui.sidebar.pages.normal[i].name+'</li></a>';
@@ -173,6 +180,17 @@
                     }
                     $('#sidebar-profile').html(sidebarprofile);
                 }
+            }
+            
+            if(Ice.data.sidebarOpen) {
+                updateSidebar();
+                $('.sidebar').css('display', 'block');
+                Ice.ui.sidebar.reposition();
+            }
+            
+            //Sidebar button
+            $('#sidebar-button').click(function() {
+                updateSidebar();
                 Ice.ui.sidebar.toggle();
             });
             
@@ -218,7 +236,8 @@
             });
             $('#modal .content').mCustomScrollbar({
                 theme: "inset-dark",
-                scrollButtons: {enable: true}
+                scrollButtons: {enable: true},
+                mouseWheel: {deltaFactor: 8}
             });
             $('#bookmarks .content .container ul').mCustomScrollbar({
                 theme: "minimal-dark"
@@ -239,16 +258,16 @@
                 if($('.suggestions .container #search-web').length == 0) {
                     $('.suggestions .container').append('<div id="search-web" class="element"><div class="type">Search on the web for <b>'+query+'</b>\
                     <div class="sites">\
-                        <a href="http://google.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/google.png" /> Google</a>\
-                        <a href="http://search.yahoo.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/yahoo.png" /> Yahoo!</a>\
-                        <a href="http://www.bing.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/bing.png" /> Bing</a>\
+                        <a href="http://google.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/google.png"> Google</a>\
+                        <a href="http://search.yahoo.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/yahoo.png"> Yahoo!</a>\
+                        <a href="http://www.bing.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/bing.png"> Bing</a>\
                     </div></div>');
                 } else {
                     $('.suggestions .container #search-web').html('<div class="type">Search on the web for <b>'+query+'</b>\
                     <div class="sites">\
-                        <a href="http://google.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/google.png" /> Google</a>\
-                        <a href="http://search.yahoo.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/yahoo.png" /> Yahoo!</a>\
-                        <a href="http://www.bing.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/bing.png" /> Bing</a>\
+                        <a href="http://google.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/google.png"> Google</a>\
+                        <a href="http://search.yahoo.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/yahoo.png"> Yahoo!</a>\
+                        <a href="http://www.bing.com/search?q='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/bing.png"> Bing</a>\
                     </div>');
                 }
                 if($('.suggestions .container #search-summoner').length == 0) {
