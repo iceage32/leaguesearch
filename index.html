@@ -295,7 +295,12 @@
             $('#searchbox').focusin(function() {
                 var needtoclose = true;
                 $('.suggestions').html('');
-                if($(this).val() != "") updateSearchSuggestions($(this).val());
+                if($(this).val() != "") {
+                    $('.two-column').hide();
+                    $('.suggestions').show();
+                    
+                    updateSearchSuggestions($(this).val());
+                }
                 $(this).bind('input', function(e) {
                     if(needtoclose) {$('.two-column').fadeOut();$('.suggestions').slideDown();}
                     
