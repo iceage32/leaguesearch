@@ -65,7 +65,7 @@ Ice.ui.background = {
             $('.backgroundlist li').click(function() {
                 Ice.data.bgType = bgType;
                 Ice.data.bg = $(this).data('value');
-                Ice.fn.data.updateCookie();
+                Ice.fn.data.updateData();
                 Ice.ui.background.set();
                 Ice.ui.modal.hide();
             });

@@ -112,7 +112,7 @@
             });
             
             //Update data from cookie
-            Ice.fn.data.updateFromCookie();
+            Ice.fn.data.updateFromData();
             console.log(Ice.data);
             
             //set background
@@ -300,6 +300,7 @@
                     $('.suggestions').show();
                     
                     updateSearchSuggestions($(this).val());
+                    needtoclose = false;
                 }
                 $(this).bind('input', function(e) {
                     if(needtoclose) {$('.two-column').fadeOut();$('.suggestions').slideDown();}
