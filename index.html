@@ -104,6 +104,7 @@
         </div>
     
         <script>
+        $(document).ready(function() {
             //Search functionality
             $("#searchbox").keyup(function(e) {
                 var code = (e.keyCode ? e.keyCode : e.which);
@@ -111,14 +112,14 @@
                     window.location = "http://google.com/search?q=" + encodeURIComponent($("#searchbox").val());
                 }
             });
-            
+
             //Update data from cookie
             Ice.fn.data.updateFromData();
             console.log(Ice.data);
-            
+
             //set background
             Ice.ui.background.set();
-            
+
             //set bookmarks
             $('#bookmark-loading').remove();
             $("#bookmarks .content .container").append('<ul id="bookmark-list"></ul>');
@@ -137,7 +138,7 @@
             updateBookmarks();
             //open bookmark add modal
             $('.bookmark-add').click(function() {
-               Ice.ui.modal.set('Add bookmark', "Link: <input type='text' id='bookmark-add-link' placeholder='http://www.example.com/' /> *do not forget http:// or https://<br/>\
+                Ice.ui.modal.set('Add bookmark', "Link: <input type='text' id='bookmark-add-link' placeholder='http://www.example.com/' /> *do not forget http:// or https://<br/>\
                                 Name: <input type='text' id='bookmark-add-name' placeholder='Example' /> *This will be displayed on the list<br/>\
                                 <input type='button' id='bookmark-add-button' value='Add' />");
                 Ice.ui.modal.show();
@@ -154,7 +155,7 @@
                 updateBookmarks();
                 return false;
             });
-            
+
             //Set news feed
             $.get((typeof Ice.data.newsfeed != 'undefined' ? Ice.data.newsfeed : Ice.settings.defaultNewsFeed), function (data) {
                 $('#newsfeed-loading').remove();
@@ -167,14 +168,14 @@
                     theme: "minimal-dark"
                 });
             });
-            
+
             function updateSidebar() {
                 var sidebarnormal = '';
                 for(var i=0;i<Ice.ui.sidebar.pages.normal.length; i++) {
                     sidebarnormal += '<a href="'+Ice.ui.sidebar.pages.normal[i].link+'"><li><img src="'+Ice.ui.sidebar.pages.normal[i].favicon+'" />'+Ice.ui.sidebar.pages.normal[i].name+'</li></a>';
                 }
                 $('#sidebar-normal').html(sidebarnormal);
-                
+
                 if(typeof Ice.data.summonerName != 'undefined' && typeof Ice.data.region != 'undefined') {
                     var sidebarprofile = '';
                     for(var i=0;i<Ice.ui.sidebar.pages.profile.length; i++) {
@@ -186,19 +187,19 @@
                     $('#sidebar-profile').html(sidebarprofile);
                 }
             }
-            
+
             if(Ice.data.sidebarOpen) {
                 updateSidebar();
                 $('.sidebar').css('display', 'block');
                 Ice.ui.sidebar.reposition();
             }
-            
+
             //Sidebar button
             $('#sidebar-button').click(function() {
                 updateSidebar();
                 Ice.ui.sidebar.toggle();
             });
-            
+
             //Settings button
             $("#settings-button").click(function() {
                 Ice.ui.modal.set('Settings', "<div class='head'>General:</div>\
@@ -229,12 +230,12 @@
                 });
                 return false;
             });
-            
+
             $(window).resize(function() {
                 //Correct sidebar
                 Ice.ui.sidebar.reposition();
             });
-            
+
             //scroll
             $('.sidebar').mCustomScrollbar({
                 theme: "minimal"
@@ -247,7 +248,7 @@
             $('#bookmarks .content .container ul').mCustomScrollbar({
                 theme: "minimal-dark"
             });
-            
+
             //search
             function updateSearchSuggestions(query) {
                 if($('.suggestions .container').length == 0) {$('.suggestions').append('<div class="container"></div>')};
@@ -286,41 +287,42 @@
                         <a href="http://www.lolking.net/search?name='+encodeURIComponent(query)+'" class="site button"><img class="favicon" src="assets/images/favicons/lolking.png" /> LoLKing</a>\
                     </div>');
                 }
-                
+
             }
             function ValidURL(str) {
                 var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-                return regexp.test(str);    
-             }
-            
+                return regexp.test(str);
+            }
+
             $('#searchbox').focusin(function() {
                 var needtoclose = true;
                 $('.suggestions').html('');
                 if($(this).val() != "") {
                     $('.two-column').hide();
                     $('.suggestions').show();
-                    
+
                     updateSearchSuggestions($(this).val());
                     needtoclose = false;
                 }
                 $(this).bind('input', function(e) {
                     if(needtoclose) {$('.two-column').fadeOut();$('.suggestions').slideDown();}
-                    
+
                     updateSearchSuggestions($(this).val());
                     if($(this).val() == "") {$('.suggestions').html(''); $('.two-column').fadeIn();needtoclose=true;}
                 });
-                
+
                 $('.suggestions .container').mCustomScrollbar();
             });
             $('#searchbox').focusout(function() {
                 setTimeout(function() {
                     $('.two-column').fadeIn();
-                    
+
                     $('.suggestions').slideUp();
                     $('.suggestions').html('');
                     $(this).unbind('input');
                 },200);
             });
+        });
         </script>
     </body>
 </html>
